@@ -8,8 +8,8 @@ from dataclasses import dataclass
 
 from typing import Any, List
 
-class Block:
 
+class Block:
     def __init__(self, index, timestamp, data, previous_hash):
         self.index = index
         self.timestamp = timestamp
@@ -19,13 +19,14 @@ class Block:
 
     def hashing(self):
         key = blake3()
-        key.update(str(self.index).encode('utf-8'))
-        key.update(str(self.timestamp).encode('utf-8'))
-        key.update(str(self.data).encode('utf-8'))
-        key.update(str(self.previous_hash).encode('utf-8'))
+        key.update(str(self.index).encode("utf-8"))
+        key.update(str(self.timestamp).encode("utf-8"))
+        key.update(str(self.data).encode("utf-8"))
+        key.update(str(self.previous_hash).encode("utf-8"))
         return key.hexdigest()
 
-class Actor: # Wallet?
+
+class Actor:  # Wallet?
     def __init__(self, name, actor_type):
         self.name = name
         self.key = self.generate_key()
@@ -33,9 +34,7 @@ class Actor: # Wallet?
 
     def generate_key(self):
         return rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-            backend=default_backend()
+            public_exponent=65537, key_size=2048, backend=default_backend()
         )
 
     @property
@@ -43,13 +42,13 @@ class Actor: # Wallet?
         pk = self.key.public_key()
         pem = pk.public_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
         )
         return pem
 
-    
     def __repr__(self):
-        return f'<{self.name}: {self.key}>'
+        return f"<{self.name}: {self.key}>"
+
 
 @dataclass
 class Como:
