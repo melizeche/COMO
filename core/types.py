@@ -47,8 +47,17 @@ class Actor:  # Wallet?
         )
         return pem
 
+    @property
+    def private_key(self):
+        pem = self.key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+        )
+        return pem
+
     def __repr__(self):
-        return f"<{self.name}: {self.key}>"
+        return f"<{self.name}: {self.public_key}>"
 
 
 @dataclass
@@ -84,11 +93,11 @@ class Transaction:
         Sign transaction with private key
         """
         self.signature = self.sender_private_key.sign(
-            str(self.to_dict).encode(),
-            padding.PSS(
+            data=str(self.to_dict).encode(),
+            padding=padding.PSS(
                 mgf=padding.MGF1(hashes.SHA256()),
                 salt_length=padding.PSS.MAX_LENGTH,
             ),
-            hashes.SHA256()
+            algorithm=hashes.SHA256()
         )
         return self.signature
