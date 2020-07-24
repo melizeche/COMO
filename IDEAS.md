@@ -1,3 +1,5 @@
+Just a draft for brainstorming
+
 # Tech stuff
 * BLAKE3 hashing algorithm(because cool kids use it and pretty good papers)
 * Proof of authority
