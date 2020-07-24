@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from blake3 import blake3
+from collections import OrderedDict
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from dataclasses import dataclass
 
 from typing import Any, List
@@ -52,7 +53,42 @@ class Actor:  # Wallet?
 
 @dataclass
 class Como:
+    uid: int
     issuer: Actor
     benefactor: Actor
     beneficiary: Actor
     timestamp: datetime = datetime.now()
+
+
+class Transaction:
+
+    def __init__(self, sender_address, sender_private_key: rsa.RSAPrivateKey, recipient_address, value):
+        # TODO: check types
+        self.sender_address = sender_address
+        self.sender_private_key = sender_private_key
+        self.recipient_address = recipient_address
+        self.value = value
+
+    def __getattr__(self, attr):
+        return self.data[attr]
+
+    def to_dict(self):
+        return dict(
+            sender_address=self.sender_address,
+            recipient_addres=self.recipient_address,
+            value=self.value
+            )
+
+    def sign_transaction(self):
+        """
+        Sign transaction with private key
+        """
+        self.signature = self.sender_private_key.sign(
+            str(self.to_dict).encode(),
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
+            ),
+            hashes.SHA256()
+        )
+        return self.signature
